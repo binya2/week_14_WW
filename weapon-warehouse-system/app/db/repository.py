@@ -1,10 +1,13 @@
-from .connection import get_db_connection, settings, get_db_first_connection
+from typing import List
+
+from core.errors import DBError
+from .connection import get_db_connection, settings
 from models import WeaponsDB
 
 
 def init_tables():
     try:
-        conn = get_db_first_connection()
+        conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(f"CREATE DATABASE IF NOT EXISTS {settings.MYSQL_DB};")
         cursor.execute(f"USE {settings.MYSQL_DB};")
@@ -33,6 +36,8 @@ def insert_weapon(data: WeaponsDB)-> bool:
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
+
+        cursor.execute(f"USE {settings.MYSQL_DB};")
         sql = (f"INSERT INTO weapons (weapon_id, weapon_name, weapon_type, range_km, weight_kg, "
                f"manufacturer, origin_country, storage_location, year_estimated, risk_level) "
                f"VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);")
@@ -46,6 +51,31 @@ def insert_weapon(data: WeaponsDB)-> bool:
     except Exception as e:
         raise Exception(f"Insert failed: {str(e)}")
 
+
+def insert_weapons(weapons: List[WeaponsDB]) -> bool:
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute(f"USE {settings.MYSQL_DB};")
+        sql = (f"INSERT INTO weapons (weapon_id, weapon_name, weapon_type, range_km, weight_kg, "
+               f"manufacturer, origin_country, storage_location, year_estimated, risk_level) "
+               f"VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);")
+        values = [
+            (w.weapon_id, w.weapon_name, w.weapon_type, w.range_km,
+                  w.weight_kg, w.manufacturer, w.origin_country, w.storage_location,
+                  w.year_estimated, w.risk_level)
+        for w in weapons
+        ]
+        cursor.executemany(sql, values)
+        conn.commit()
+        count = cursor.rowcount
+        conn.close()
+        return count
+    except Exception as e:
+        raise DBError(str(e))
+
+
 def fetch_all_weapons()-> list[dict]:
     try:
         conn = get_db_connection()
@@ -55,4 +85,4 @@ def fetch_all_weapons()-> list[dict]:
         conn.close()
         return results
     except Exception as e:
-        raise Exception(f"Fetch failed: {str(e)}")
+        raise DBError(str(e))

@@ -13,11 +13,17 @@ spec:
         app: api-app
     spec:
       containers:
-      - name: api-app
-        image: ###
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 8000
-        env:
-        - name: MYSQL_HOST
-          value: "mysql-0.mysql"
+        - name: api-app
+          image: ###
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          env:
+            - name: MYSQL_HOST
+              value: "mysql-0.mysql"
+            - name: MYSQL_USER
+              value: "root"
+            - name: MYSQL_PASSWORD
+              value: "Benny31."
+            - name: MYSQL_DB
+              value: "week_14_WW"
