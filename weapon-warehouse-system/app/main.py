@@ -1,11 +1,25 @@
 import io
 import os
+from contextlib import asynccontextmanager
 
 import pandas as pd
-from fastapi import FastAPI, UploadFile
 import uvicorn
+from fastapi import FastAPI
+from fastapi import UploadFile
 
-app = FastAPI(title="weapon-warehouse-system")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("Executing database initialization...")
+    try:
+        pass # init_db()
+    except Exception as e:
+        print(f"Startup failed: {e}")
+    yield
+    print("Server shutting down...")
+
+
+app = FastAPI(title="weapon-warehouse-system", lifespan=lifespan)
 
 
 @app.post("/upload")
@@ -14,14 +28,13 @@ async def upload_file(file: UploadFile):
     csv_string = content.decode('utf-8')
     df = pd.read_csv(io.StringIO(csv_string))
     print(df)
-    return {"filename": file.filename,
-            "data:": df.to_dict()}
+    return {"filename": file.filename, "rows": len(df)}
 
 
 if __name__ == "__main__":
     uvicorn.run(
-        app="main:app",
+        'main:app',
         host="0.0.0.0",
-        port=os.getenv("DB_PORT", 8000),
+        port=8000,
         reload=True,
     )
