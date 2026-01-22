@@ -27,9 +27,10 @@ async def data_processing(file: UploadFile) -> pd.DataFrame:
 async def save_to_db(df_weapon):
     deta = df_weapon.to_dict(orient='records')
     list = [dic for dic in deta if insert_weapon(WeaponsDB(**dic))]
-    count = insert_weapons(list)
-    # for item in deta:
-    #     print(item)
-    #     if insert_weapon(WeaponsDB(**item)):
-    #         count += 1
+    # count = insert_weapons(list)
+    count = 0
+    for item in deta:
+        print(item)
+        if insert_weapon(WeaponsDB(**item)):
+            count += 1
     return {"status": "success", "records_added": count}
