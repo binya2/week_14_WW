@@ -1,0 +1,4 @@
+docker build -t beni2/service-b:latest .
+docker push beni2/service-b:latest
+oc apply -f /.
+os get pods

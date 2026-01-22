@@ -7,7 +7,7 @@ spec:
     matchLabels:
       app: mysql
   serviceName: mysql
-  replicas: 1
+  replicas: 2
   template:
     metadata:
       labels:
@@ -16,10 +16,10 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
         - name: mysql
-          image: mysql:8.0
+          image: mysql
           env:
             - name: MYSQL_ROOT_PASSWORD
-              value: "okaoka1234"
+              value: "Benny31."
             - name: MYSQL_DATABASE
               value: "weapons_db"
           ports:
@@ -33,7 +33,6 @@ spec:
         name: db-volume
       spec:
         accessModes: [ "ReadWriteOnce" ]
-        storageClassName: standard
         resources:
           requests:
             storage: 1Gi
