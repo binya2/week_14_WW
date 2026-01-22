@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: api-app
-          image: ###
+          image: beni2/api-app:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8000
@@ -26,4 +26,4 @@ spec:
             - name: MYSQL_PASSWORD
               value: "Benny31."
             - name: MYSQL_DB
-              value: "week_14_WW"
+              value: "weapons_db"
