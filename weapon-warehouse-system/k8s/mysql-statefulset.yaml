@@ -6,8 +6,8 @@ spec:
   selector:
     matchLabels:
       app: mysql
-  serviceName: mysql-service
-  replicas: 3
+  serviceName: mysql
+  replicas: 1
   template:
     metadata:
       labels:
@@ -16,10 +16,12 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
         - name: mysql
-          image: mysql
+          image: mysql:8.0
           env:
             - name: MYSQL_ROOT_PASSWORD
               value: "okaoka1234"
+            - name: MYSQL_DATABASE
+              value: "weapons_db"
           ports:
             - containerPort: 3306
               name: db
