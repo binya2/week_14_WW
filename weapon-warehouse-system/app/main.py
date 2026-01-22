@@ -1,18 +1,18 @@
-import io
-import os
 from contextlib import asynccontextmanager
 
-import pandas as pd
 import uvicorn
 from fastapi import FastAPI
 from fastapi import UploadFile
+
+from db.repository import init_tables
+from service import data_processing, save_to_db
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("Executing database initialization...")
     try:
-        pass # init_db()
+        init_tables()
     except Exception as e:
         print(f"Startup failed: {e}")
     yield
@@ -24,11 +24,13 @@ app = FastAPI(title="weapon-warehouse-system", lifespan=lifespan)
 
 @app.post("/upload")
 async def upload_file(file: UploadFile):
-    content = await file.read()
-    csv_string = content.decode('utf-8')
-    df = pd.read_csv(io.StringIO(csv_string))
-    print(df)
-    return {"filename": file.filename, "rows": len(df)}
+    data = await data_processing(file)
+    response = await save_to_db(data)
+    return {
+        "filename": file.filename,
+        "status": "processed",
+        "db_response": response
+    }
 
 
 if __name__ == "__main__":
